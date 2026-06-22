@@ -6,16 +6,15 @@
 
 locals {
   name_prefix = "${var.project_name}-${var.environment}"
-  bucket_name = "${var.project_name}-uploads-${var.environment}"
 }
 
-# ── S3 Bucket ─────────────────────────────────────────────────────────────────
+# ── S3 Bucket (Uploads) ───────────────────────────────────────────────────────
 
 resource "aws_s3_bucket" "uploads" {
-  bucket = local.bucket_name
+  bucket = "serene-stay-uploads-demo-ramesh-98"
 
   tags = {
-    Name = local.bucket_name
+    Name = "serene-stay-uploads-demo-ramesh-98"
   }
 }
 
@@ -98,10 +97,10 @@ resource "aws_s3_bucket_cors_configuration" "uploads" {
 # ── Access Logging Bucket ─────────────────────────────────────────────────────
 
 resource "aws_s3_bucket" "access_logs" {
-  bucket = "${local.bucket_name}-access-logs"
+  bucket = "serene-stay-uploads-demo-access-logs-ramesh-98"
 
   tags = {
-    Name = "${local.bucket_name}-access-logs"
+    Name = "serene-stay-uploads-demo-access-logs-ramesh-98"
   }
 }
 

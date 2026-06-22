@@ -1,15 +1,8 @@
-###############################################################################
-# bootstrap/main.tf
-# Run ONCE before the main Terraform to create the S3 backend + DynamoDB lock
-# Usage: cd terraform/bootstrap && terraform init && terraform apply
-###############################################################################
-
 terraform {
-  required_version = ">= 1.6.0"
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 5.0"
+      version = "~> 5.100.0"
     }
   }
 }
@@ -21,22 +14,25 @@ provider "aws" {
 variable "aws_region"   { default = "us-east-1" }
 variable "project_name" { default = "serene-stay" }
 
-# ── S3 bucket for Terraform state ────────────────────────────────────────────
-
+# --- 1. S3 Bucket for Terraform state (Unique Name) ---
 resource "aws_s3_bucket" "tfstate" {
-  bucket = "${var.project_name}-tfstate"
+  bucket = "serene-stay-tfstate-ramesh-98"
 
   tags = {
-    Name      = "${var.project_name}-tfstate"
+    Name      = "serene-stay-tfstate-ramesh-98"
     ManagedBy = "Terraform Bootstrap"
   }
 }
 
+# --- 2. Bucket Versioning ---
 resource "aws_s3_bucket_versioning" "tfstate" {
   bucket = aws_s3_bucket.tfstate.id
-  versioning_configuration { status = "Enabled" }
+  versioning_configuration {
+    status = "Enabled"
+  }
 }
 
+# --- 3. Bucket Server Side Encryption ---
 resource "aws_s3_bucket_server_side_encryption_configuration" "tfstate" {
   bucket = aws_s3_bucket.tfstate.id
   rule {
@@ -46,6 +42,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "tfstate" {
   }
 }
 
+# --- 4. Public Access Block ---
 resource "aws_s3_bucket_public_access_block" "tfstate" {
   bucket                  = aws_s3_bucket.tfstate.id
   block_public_acls       = true
@@ -54,8 +51,7 @@ resource "aws_s3_bucket_public_access_block" "tfstate" {
   restrict_public_buckets = true
 }
 
-# ── DynamoDB table for state locking ─────────────────────────────────────────
-
+# --- 5. DynamoDB Table for State Locking ---
 resource "aws_dynamodb_table" "tfstate_lock" {
   name         = "${var.project_name}-tfstate-lock"
   billing_mode = "PAY_PER_REQUEST"
@@ -72,5 +68,11 @@ resource "aws_dynamodb_table" "tfstate_lock" {
   }
 }
 
-output "tfstate_bucket"        { value = aws_s3_bucket.tfstate.bucket }
-output "tfstate_lock_table"    { value = aws_dynamodb_table.tfstate_lock.name }
+# --- Outputs ---
+output "tfstate_bucket" {
+  value = aws_s3_bucket.tfstate.bucket
+}
+
+output "tfstate_lock_table" {
+  value = aws_dynamodb_table.tfstate_lock.name
+}

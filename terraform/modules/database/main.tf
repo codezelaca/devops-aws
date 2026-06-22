@@ -75,7 +75,7 @@ resource "aws_db_instance" "main" {
   multi_az = false
 
   # Backups
-  backup_retention_period  = 3
+  backup_retention_period  = 1
   backup_window            = "03:00-04:00"
   maintenance_window       = "Mon:04:00-Mon:05:00"
   copy_tags_to_snapshot    = true

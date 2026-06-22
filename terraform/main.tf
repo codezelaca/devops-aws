@@ -20,10 +20,9 @@ terraform {
 
   # Remote state — S3 backend (run bootstrap first)
   backend "s3" {
-    bucket         = "serene-stay-tfstate"
-    key            = "demo/terraform.tfstate"
+    bucket         = "serene-stay-tfstate-ramesh-98" # <- මෙන්න මේ නම විතරක් වෙනස් කරන්න
+    key            = "dev/terraform.tfstate"
     region         = "us-east-1"
-    encrypt        = true
     dynamodb_table = "serene-stay-tfstate-lock"
   }
 }
